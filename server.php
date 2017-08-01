@@ -56,11 +56,11 @@ class server
     }
     public function login($serv,$name,$fd){
         $redi=$this->redis_init();
-        $n=array('name' =>htmlentities($name),'fd'=>$fs);
+        $n=array('name' =>htmlentities($name),'fd'=>$fd);
         if($redi->exists($fd)){
             $info='false';
         }else{
-            $redi->set($fd,));
+            $redi->set($fd,json_encode($n));
             $info='true';
         }
         $d=json_encode(['type'=>1,'info'=>$info,'name'=>htmlentities($name),'fd'=>$fd,'avatar'=>'./static/images/avatar/f1/f_'.rand(1,12).'.jpg']);
@@ -73,7 +73,8 @@ class server
         $data=json_decode($data,true);
         $datas['type']=$data['type'];
         $datas['avatar']=$data['avatar'];
-        $datas['name']=htmlentities(self::redis_init()->get($fds));
+        $user=json_decode(self::redis_init()->get($fds),true);
+        $datas['name']=$user['name'];
         $datas['newmessage']=htmlentities($data['message']);
         $datas['time']=date('Y-m-d H:i:s',time());
         if(count($this->serv->connections)>1){
